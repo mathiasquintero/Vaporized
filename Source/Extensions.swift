@@ -2,6 +2,7 @@
 import Foundation
 import HTTP
 import Turnstile
+import Auth
 import Vapor
 import VaporMongo
 
