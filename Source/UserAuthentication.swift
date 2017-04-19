@@ -14,9 +14,9 @@ enum GrantType: String, NodeConvertible {
     case refreshToken = "refresh_token"
 }
 
-final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Account, ResponseRepresentable {
+public final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Account, ResponseRepresentable {
 
-    var uniqueID: String {
+    public var uniqueID: String {
         return accountID.string ?? ""
     }
 
@@ -34,7 +34,7 @@ final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Accoun
         self.accountID = accountID
     }
 
-    init(node: Node, in context: Context) throws {
+    public init(node: Node, in context: Context) throws {
         self.token = try node.extract("token")
         self.refreshToken = try node.extract("refreshToken")
         self.expirationDate = try node.extract("expirationDate")
@@ -42,7 +42,7 @@ final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Accoun
         self.accountID = try node.extract("accountID")
     }
 
-    func makeNode(context: Context) throws -> Node {
+    public func makeNode(context: Context) throws -> Node {
         return try Node(node: [
                 "token": token,
                 "refreshToken": refreshToken,
@@ -52,7 +52,7 @@ final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Accoun
             ])
     }
 
-    func makeResponse() throws -> Response {
+    public func makeResponse() throws -> Response {
         return try makeJSON().makeResponse()
     }
 
@@ -65,7 +65,7 @@ final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Accoun
             ])
     }
 
-    func user() throws -> UserType {
+    public func user() throws -> UserType {
         guard let user = try AuthenticatedUser<UserType>.authenticate(credentials: Identifier(id: accountID)) as? AuthenticatedUser<UserType> else {
 
             throw AuthError.invalidCredentials
@@ -73,7 +73,7 @@ final class Token<UserType: Authenticated>: NodeConvertible, Credentials, Accoun
         return user.userData
     }
 
-    func refresh(with refreshToken: String, expiration: Int) throws -> Token<UserType> {
+    public func refresh(with refreshToken: String, expiration: Int) throws -> Token<UserType> {
         guard refreshToken == self.refreshToken else {
             throw AuthError.invalidCredentials
         }
@@ -152,7 +152,7 @@ final class OAuthSessionManager<UserType: Authenticated>: SessionManager {
     }
 }
 
-class OAuthMiddleware<UserType: Authenticated>: Middleware {
+public class OAuthMiddleware<UserType: Authenticated>: Middleware {
 
     private let turnstile: Turnstile
 
@@ -160,9 +160,9 @@ class OAuthMiddleware<UserType: Authenticated>: Middleware {
         self.turnstile = turnstile
     }
 
-    init() {
-        let session = OAuthSessionManager<UserType>(cache: MemoryCache())
-        turnstile = Turnstile(sessionManager: session, realm: session.realm)
+    public convenience init(cache: CacheProtocol = MemoryCache()) {
+        let session = OAuthSessionManager<UserType>(cache: cache)
+        self.init(turnstile: Turnstile(sessionManager: session, realm: session.realm))
     }
 
     public func respond(to request: Request, chainingTo next: Responder) throws -> Response {

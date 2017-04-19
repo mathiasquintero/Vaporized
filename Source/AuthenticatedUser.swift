@@ -19,11 +19,15 @@ final class AuthenticationController<UserType: Authenticated>: Controller<UserTy
 
 }
 
-protocol Authenticated: Model {
-    var tokenExpirationDefault: Int { get }
+public protocol Authenticated: Model {
+    static var tokenExpirationDefault: Int { get }
 }
 
 extension Authenticated {
+    
+    static var tokenExpirationDefault: Int {
+        return 60
+    }
 
     static var preparations: [Preparation.Type] {
         return [Self.self, AuthenticatedUser<Self>.self]

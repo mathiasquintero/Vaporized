@@ -4,7 +4,6 @@ import HTTP
 import Turnstile
 import Auth
 import Vapor
-import VaporMongo
 
 infix operator <~: AssignmentPrecedence
 
@@ -39,21 +38,6 @@ extension Date: NodeConvertible {
 
     public func makeNode(context: Context) throws -> Node {
         return .number(.double(timeIntervalSince1970))
-    }
-
-}
-
-extension Droplet {
-
-    public static func create(with types: Applyable.Type...) throws {
-        try create(with: types)
-    }
-
-    public static func create(with types: [Applyable.Type]) throws {
-        let drop = Droplet()
-        try drop.addProvider(VaporMongo.Provider.self)
-        drop.add(types: types)
-        drop.run()
     }
 
 }
